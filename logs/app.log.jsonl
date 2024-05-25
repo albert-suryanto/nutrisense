@@ -1,0 +1,62 @@
+{
+  "level": "DEBUG",
+  "message": "debug message",
+  "timestamp": "2024-02-13T17:04:31.139539+00:00",
+  "logger": "my_app",
+  "module": "main",
+  "function": "main",
+  "line": 7,
+  "thread_name": "MainThread",
+  "stack_info": "Stack (most recent call last):\n  File \"/Users/albert/code/template.python/src/main.py\", line 19, in <module>\n    main()\n  File \"/Users/albert/code/template.python/src/main.py\", line 7, in main\n    logger.debug(\"debug message\")"
+}
+{
+  "level": "INFO",
+  "message": "info message",
+  "timestamp": "2024-02-13T17:04:31.139886+00:00",
+  "logger": "my_app",
+  "module": "main",
+  "function": "main",
+  "line": 8,
+  "thread_name": "MainThread"
+}
+{
+  "level": "WARNING",
+  "message": "warning message",
+  "timestamp": "2024-02-13T17:04:31.140005+00:00",
+  "logger": "my_app",
+  "module": "main",
+  "function": "main",
+  "line": 9,
+  "thread_name": "MainThread"
+}
+{
+  "level": "ERROR",
+  "message": "error message",
+  "timestamp": "2024-02-13T17:04:31.140135+00:00",
+  "logger": "my_app",
+  "module": "main",
+  "function": "main",
+  "line": 10,
+  "thread_name": "MainThread"
+}
+{
+  "level": "CRITICAL",
+  "message": "critical message",
+  "timestamp": "2024-02-13T17:04:31.140252+00:00",
+  "logger": "my_app",
+  "module": "main",
+  "function": "main",
+  "line": 11,
+  "thread_name": "MainThread"
+}
+{
+  "level": "ERROR",
+  "message": "exception ZeroDivisionError message",
+  "timestamp": "2024-02-13T17:04:31.140366+00:00",
+  "logger": "my_app",
+  "module": "main",
+  "function": "main",
+  "line": 15,
+  "thread_name": "MainThread",
+  "exc_info": "Traceback (most recent call last):\n  File \"/Users/albert/code/template.python/src/main.py\", line 13, in main\n    1 / 0\nZeroDivisionError: division by zero"
+}

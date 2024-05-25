@@ -1,0 +1,89 @@
+[tool.poetry]
+name = "nutrisense"
+version = "0.1.0"
+description = ""
+authors = ["albert_suryanto <albert_suryanto@hotmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-dotenv = "^1.0.0"
+sqlalchemy = "^2.0.17"
+psycopg2-binary = "^2.9.6"
+alembic = "^1.11.1"
+fastapi = "^0.95.1"
+uvicorn = "^0.21.1"
+dependency-injector = "^4.41.0"
+typing-extensions = "^4.5.0"
+structlog = "^23.1.0"
+colorlog = "^6.7.0"
+google-generativeai = "^0.5.4"
+pillow = "^10.3.0"
+openai = "^1.30.1"
+anthropic = "^0.26.1"
+
+[tool.poetry.group.dev.dependencies]
+jupyter = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+skip-string-normalization = true
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs         # exclude a few common directories in the root of the project
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+line-length = 88
+src = ["src"]
+select = [
+  "B",   # bugbear
+  "C",   # mccabe
+  "E",   # pycodestyle
+  "F",   # pyflakes
+  "W",   # pycodestyle-word
+]
+ignore = [
+  "B006",   # Do not use mutable data structures for argument defaults
+  "B008",   # Do not perform function call `os.getenv` in argument defaults
+  "E501",   # This error is raised when you have a line that's too long. By default, PEP 8 recommends to have a maximum of 79 characters in a line
+]
+exclude = [
+  "alembic/script.py.mako",
+]
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.mypy]
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+show_error_codes = true
+no_implicit_optional = true
+warn_unused_ignores = true
+exclude = [
+  "config",
+  "infra",
+  "nix",
+  "scripts"
+]

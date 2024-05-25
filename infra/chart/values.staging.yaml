@@ -1,0 +1,102 @@
+deploy: true
+
+replicaCount: 1
+
+image:
+  repository: harbor.admin.tech/team/nutrisense/api
+  pullPolicy: IfNotPresent
+  tag: ""
+
+
+imagePullSecrets:
+  - name: team-rbac-setup-docker-pull-secret-team
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: nutrisense-service-account
+
+externalSecret:
+  secretStore:
+    name: awsssm-store
+    kind: ClusterSecretStore
+  policy:
+    creation: Owner
+    deletion: Retain
+  remoteRef:
+    key: staging/nutrisense/env
+
+envFile:
+  name: envfile
+  key: .env
+  deploy: true
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext:
+  privileged: false
+  seccompProfile:
+    type: RuntimeDefault
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "ambassador"
+  annotations: {}
+  hosts:
+    - host: api.nutrisense.team.staging.tech
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: nutrisense-service-staging-tls
+      issuerRef: cluster-issuer-letsencrypt-issuer
+      hosts:
+        - api.nutrisense.team.staging.tech
+
+resources:
+  limits:
+    cpu: 2
+    memory: 4Gi
+  requests:
+    cpu: 1
+    memory: 2Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector:
+  kubernetes.io/arch: "arm64"
+
+tolerations: []
+
+affinity: {}
+
+app:
+  server:
+    port: 8000
+    env: staging
+    host: "0.0.0.0"
+    ttl: 20s
+  logger:
+    level: info
+  command: ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--chdir", "src", "main:flask_app",  "--timeout", "30", "--access-logfile",  "-"]
+
+cronjobs: []

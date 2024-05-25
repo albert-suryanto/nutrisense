@@ -1,0 +1,70 @@
+{{- if .Values.cronjobs -}}
+{{- $fullName := include "nutrisense.fullname" . -}}
+{{- $serviceAccountName := include "nutrisense.serviceAccountName" . -}}
+{{- $selectorLabels := include "nutrisense.selectorLabels" . -}}
+
+{{- $root := . -}}
+
+{{- range $cronjob := .Values.cronjobs -}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ $fullName }}-{{ $cronjob.name }}
+spec:
+  schedule: {{ $cronjob.schedule }}
+  successfulJobsHistoryLimit: 0
+  selector:
+    matchLabels:
+      {{- $selectorLabels | nindent 6 }}
+  concurrencyPolicy: {{ $cronjob.policies.concurrencyPolicy }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: {{ $fullName }}-{{ $cronjob.name }}
+            {{- $selectorLabels | nindent 12 }}
+        spec:
+          {{- with $.Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            {{- toYaml $root.Values.podSecurityContext | nindent 12 }}
+          serviceAccountName: {{ $serviceAccountName }}
+          containers:
+            - name: {{ $fullName }}-{{ $cronjob.name }}
+              securityContext:
+                {{- toYaml $root.Values.securityContext | nindent 16 }}
+              image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag | default $root.Chart.AppVersion }}"
+              imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+              command:
+                {{- toYaml $cronjob.command | nindent 16 }}
+              ports:
+                - name: http
+                  containerPort: {{ $cronjob.server.port }}
+                  protocol: TCP
+              resources:
+                {{- toYaml $cronjob.resources | nindent 16 }}
+              volumeMounts:
+                - name: "config"
+                  mountPath: "/app/src/.env"
+                  subPath: .env
+              env:
+                - name: ENV
+                  value: {{ $cronjob.server.env }}
+          volumes:
+          - name: "config"
+            secret:
+              secretName: {{ $root.Release.Name }}-{{ $root.Values.envFile.name }}
+              items:
+                - key: {{ $root.Values.envFile.key }}
+                  path: .env
+          restartPolicy: {{ $cronjob.policies.restartPolicy }}
+          {{- with $.Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+---
+{{- end -}}
+{{- end -}}

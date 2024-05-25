@@ -1,0 +1,9 @@
+- id: ruff
+  name: Lint py files with ruff
+  description: "Run 'ruff' for extremely fast Python linting"
+  entry: ruff check --force-exclude
+  language: python
+  "types_or": [python, pyi]
+  args: [--fix]
+  require_serial: true
+  additional_dependencies: []

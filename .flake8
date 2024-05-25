@@ -1,0 +1,64 @@
+[flake8]
+
+# Recommend matching the black line length (default 88),
+# rather than using the flake8 default of 79:
+max-line-length = 88
+select =
+    # Core selection
+    # All E class violations are “errors” reported by pycodestyle. List of error codes: https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes
+    E,
+    # All F class violations are reported by pyflakes which checks for various issues like unused imports, undefined names, and more. List of error codes: https://flake8.pycqa.org/en/latest/user/error-codes.html
+    F,
+    # All W class violations are “warnings” reported by pycodestyle. List of error codes: https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes
+    W,
+
+    # Additional selection
+    # Issues reported by the flake8-bugbear plugin, which checks for potential bugs and design issues in the code
+    # B,
+    # Issues reported by the flake8-blind-except plugin, which checks for non-specific or "blind" exception handling in the code
+    # B9,
+    # Issues reported by the mccabe plugin, which checks for code complexity. The only violation reported by this plugin is C901, based on the complexity value provided by the user
+    C,
+    # Issues reported by the flake8-todo plugin, which checks for TODO comments in the code
+    T4
+extend-ignore =
+    # The "D" codes are related to the pydocstyle checks for your docstrings. Your code is also being checked against some of the style conventions from PEP 257, which is the Python proposal that outlines how docstrings should be formatted
+    D,
+    # Incompatible with black see https://github.com/ambv/black/issues/315
+    # See https://github.com/PyCQA/pycodestyle/issues/373
+    # flake8/pycodechecker give false positives on black code
+    # E203: whitespace before ':'
+    # W503: This warning is raised when the line break is before a binary operator. This rule has been controversial because PEP 8 used to recommend that the line break should be before the binary operator, but then it was later changed to recommend that the line break should be after the binary operator.
+    E203, W503,
+
+    # Code lines and '#'
+    # E501: This error is raised when you have a line that's too long. By default, Flake8 allows a maximum of 79 characters in a line, which is a recommendation from PEP 8.
+    E501,
+    # E266: This error is raised when you have too many leading '#' for a block comment. PEP 8 recommends a maximum of two leading '#' for block comments.
+    E266
+
+max-complexity = 18
+
+
+# # Most of our test cases deliberately violate style checks:
+# per-file-ignores =
+#     # These are meant to trigger black changes:
+#     tests/test_changes/hello_world.py: E201,E202,E211,W391,BLK100
+#     tests/test_changes/hello_world_EOF.py: W292,BLK100
+#     tests/without_pyproject_toml/ordinary_quotes.py: Q000,BLK100
+#     # These are not meant to trigger black changes:
+#     tests/test_cases/no_closing_bracket.py: E902
+#     tests/test_fail/mixed_tab_spaces.py: E101,E999,W191
+#     tests/with_pyproject_toml/ordinary_quotes.py: Q000
+#     tests/test_cases/mixed_tab_spaces.py: E101,E999,W191
+#     # The bad TOML file breaks black checking this file:
+#     tests/with_bad_toml/hello_world.py: BLK997,
+
+exclude =
+    .venv
+
+# =====================
+# flake-quote settings:
+# =====================
+# Set this to match black style:
+inline-quotes = double

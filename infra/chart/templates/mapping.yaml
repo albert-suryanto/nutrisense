@@ -1,0 +1,18 @@
+{{- if eq .Values.ingress.className "ambassador" -}}
+{{- $fullName := include "nutrisense.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- $firstHost := index .Values.ingress.hosts 0 -}}
+{{- $firstPath := index $firstHost.paths 0 -}}
+
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: {{ $fullName }}-mapping
+spec:
+  hostname: {{ $firstHost.host }}
+  prefix: {{ $firstPath.path }}
+  service: {{ $fullName }}:{{ $svcPort }}
+  timeout_ms: 120000
+  allow_upgrade:
+    - websocket
+{{- end -}}

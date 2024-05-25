@@ -1,0 +1,25 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Setup the repository for development
+    cmds:
+      - task: python
+      - task: pre-commit
+
+  pre-commit:
+    desc: Setup Pre-Commit
+    sources:
+      - config/.pre-commit-config.yaml
+    cmds:
+      - pre-commit install -c ./config/.pre-commit-config.yaml --install-hooks
+      - pre-commit install -c ./config/.pre-commit-config.yaml -t commit-msg
+      - precommit-nix-patch patch
+
+  python:
+    desc: Setup Python Workspace
+    sources:
+      - pyproject.toml
+    cmds:
+      - poetry config virtualenvs.in-project true
+      - poetry install

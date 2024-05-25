@@ -1,0 +1,6 @@
+version: "3"
+vars:
+  CLUSTER_NAME: "nutrisense-service"
+  SERVICE_NAME: "nutrisense-service"
+includes:
+  setup: ./scripts/Taskfile.setup.yml

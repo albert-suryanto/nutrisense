@@ -1,0 +1,107 @@
+deploy: true
+
+replicaCount: 1
+
+image:
+  repository: nutrisense
+  pullPolicy: IfNotPresent
+  tag: ""
+
+
+imagePullSecrets:
+  - name: team-rbac-setup-docker-pull-secret-team
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: nutrisense-service-account
+
+externalSecret:
+  secretStore:
+    name: awsssm-store
+    kind: ClusterSecretStore
+  policy:
+    creation: Owner
+    deletion: Retain
+  remoteRef:
+    key: ""
+
+envFile:
+  name: envfile
+  key: .env
+  deploy: true
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext:
+  privileged: false
+  seccompProfile:
+    type: RuntimeDefault
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations: {}
+  hosts:
+    - host: api.nutrisense.127.0.0.1.nip.io
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+resources:
+  limits:
+    cpu: 1
+    memory: 2Gi
+  requests:
+    cpu: 0.5
+    memory: 1Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector:
+  kubernetes.io/arch: "arm64"
+
+tolerations: []
+
+affinity: {}
+
+app:
+  server:
+    port: 8000
+    env: development
+    host: "0::0"
+    ttl: 20s
+  logger:
+    level: debug
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 10
+
+cronjobs: []
