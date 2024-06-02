@@ -81,8 +81,9 @@ def session_scope(session_factory: DatabaseSessionProvider):
     try:
         yield session
         session.commit()
-    except Exception:
+    except Exception as e:
         session.rollback()
-        raise
+        raise e
     finally:
+        session.expunge_all()
         session.close()

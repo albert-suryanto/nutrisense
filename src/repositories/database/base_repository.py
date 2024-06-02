@@ -1,6 +1,6 @@
 from typing import Any
 
-from src.database.database_session_provider import DatabaseSessionProvider
+from src.repositories.database.database_session_provider import DatabaseSessionProvider
 
 
 class BaseSQLAlchemyRepository:
