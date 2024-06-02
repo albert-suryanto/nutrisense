@@ -84,7 +84,4 @@ class FoodService:
                 )
                 food_nutrients.append(food_nutrient)
 
-            self.logger.info(
-                f"Creating {len(food_nutrients)} food nutrients with: {[(data.food_id, data.nutrient_id) for data in food_nutrients]}"
-            )
             self.food_nutrient_repo.bulk_create(food_nutrients)
