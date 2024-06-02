@@ -1,15 +1,15 @@
-import logging
 import structlog
 from typing import Dict, Any
+import src.system.logger as logger
 from src.system.logger import LoggerInterface
 
 
 class StructLogLogger(LoggerInterface):
-    def __init__(self, logger_name=None, logging_level=logging.INFO):
+    def __init__(self, logger_name=None, logging_level=logger.INFO):
         self.logger = structlog.getLogger(logger_name or __name__)
         self.configure_logger(logging_level)
 
-    def configure_logger(self, level=logging.INFO):
+    def configure_logger(self, level=logger.INFO):
         structlog.configure(
             processors=[
                 structlog.stdlib.filter_by_level,
