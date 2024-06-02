@@ -54,7 +54,7 @@ class DatabaseSessionProvider(providers.Provider):
             pool_recycle=3300,
             pool_timeout=3000,
             pool_pre_ping=True,
-            echo=True,
+            echo=False,
         )
         self.session = sessionmaker(
             bind=self.engine, autocommit=False, autoflush=False, query_cls=RetryingQuery

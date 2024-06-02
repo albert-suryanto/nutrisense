@@ -51,10 +51,24 @@ class FoodService:
             )
             food = self.food_repo.get_or_create(food)
 
+            nutrients_to_process = [
+                Nutrient(name=nutrient_data['name'])
+                for nutrient_data in item['foodNutrients']
+            ]
+            nutrients = self.nutrient_repo.bulk_get_or_create(nutrients_to_process)
             food_nutrients = []
             for nutrient_data in item['foodNutrients']:
-                nutrient = Nutrient(name=nutrient_data['name'])
-                nutrient = self.nutrient_repo.get_or_create(nutrient)
+                nutrient = next(
+                    (item for item in nutrients if item.name == nutrient_data['name']),
+                    None,
+                )
+                if nutrient is None:
+                    self.logger.error(
+                        f"Nutrient {nutrient_data['name']} not found in database"
+                    )
+                    raise Exception(
+                        f"Nutrient {nutrient_data['name']} not found in database for food {food.name}"
+                    )
 
                 amount = (
                     nutrient_data['amount']
@@ -69,5 +83,8 @@ class FoodService:
                     unit_name=nutrient_data['unitName'],
                 )
                 food_nutrients.append(food_nutrient)
-                # self.food_nutrient_repo.get_or_create(food_nutrient)
+
+            self.logger.info(
+                f"Creating {len(food_nutrients)} food nutrients with: {[(data.food_id, data.nutrient_id) for data in food_nutrients]}"
+            )
             self.food_nutrient_repo.bulk_create(food_nutrients)

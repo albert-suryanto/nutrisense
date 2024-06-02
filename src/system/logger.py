@@ -13,6 +13,27 @@ LEVEL_COLORS = {
     "CRITICAL": "white,bg_red",
 }
 
+# Adapted from the stdlib
+CRITICAL = 50
+FATAL = CRITICAL
+ERROR = 40
+WARNING = 30
+WARN = WARNING
+INFO = 20
+DEBUG = 10
+NOTSET = 0
+
+LOG_LEVEL = {
+    "CRITICAL": CRITICAL,
+    "FATAL": FATAL,
+    "ERROR": ERROR,
+    "WARNING": WARNING,
+    "WARN": WARN,
+    "INFO": INFO,
+    "DEBUG": DEBUG,
+    "NOTSET": NOTSET,
+}
+
 
 class LoggerInterface(ABC):
     @abstractmethod
@@ -41,6 +62,9 @@ class LoggerInterface(ABC):
     @abstractmethod
     def debug(self, message, **kwargs):
         pass
+
+    def get_log_level(self, level: str):
+        return LOG_LEVEL.get(level)
 
     def create_stream_handler(self, level=logging.INFO):
         self.logger.setLevel(level)

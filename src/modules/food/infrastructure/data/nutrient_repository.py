@@ -39,32 +39,48 @@ class NutrientRepository:
             result = self.create(nutrient)
         return result
 
-    def bulk_create(self, nutrients: List[Nutrient]):
+    def bulk_get_or_create(self, nutrients: List[Nutrient]):
         count = len(nutrients)
-        self.logger.info(f"Receive {count} for bulk creating nutrients with details")
+        self.logger.info(
+            f"Bulk get or create {count} nutrients with names: {[nutrient.name for nutrient in nutrients]}"
+        )
 
         with session_scope(self.db_session_provider) as session:
-            existing_nutrient_ids = (
-                session.query(Nutrient.id)
-                .filter(Nutrient.id.in_([item.id for item in nutrients]))
+            existing_nutrients = (
+                session.query(Nutrient)
+                .filter(Nutrient.name.in_([item.name for item in nutrients]))
                 .all()
             )
 
-            existing_ids = {id_tuple[0] for id_tuple in existing_nutrient_ids}
-
+            existing_nutrient_dict = {
+                nutrient.name: nutrient for nutrient in existing_nutrients
+            }
             new_nutrients = [
-                nutrient for nutrient in nutrients if nutrient.id not in existing_ids
+                nutrient
+                for nutrient in nutrients
+                if nutrient.name not in existing_nutrient_dict
             ]
 
-            new_count = len(new_nutrients)
-            self.logger.info(
-                f"Creating {new_count} new nutrients and skipping {count - new_count} existing ones."
-            )
+            if new_nutrients:
+                new_count = len(new_nutrients)
+                self.logger.info(
+                    f"Creating {new_count} new nutrients and skipping {count - new_count} existing ones."
+                )
 
-            session.add_all(new_nutrients)
-            session.commit()
-            session.refresh(new_nutrients)
-            session.expunge(new_nutrients)
+                session.add_all(new_nutrients)
+                session.commit()
 
-        self.logger.info("Bulk creation of food nutrients completed.")
-        return new_nutrients
+                existing_nutrient_dict.update(
+                    {nutrient.name: nutrient for nutrient in new_nutrients}
+                )
+
+            result_list = list(existing_nutrient_dict.values())
+            for nutrient in result_list:
+                session.refresh(nutrient)
+                session.expunge(nutrient)
+
+        self.logger.info(
+            f"Created {len(new_nutrients)} new nutrients and found {len(existing_nutrients)} existing nutrients."
+        )
+
+        return result_list
