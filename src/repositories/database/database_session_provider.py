@@ -57,7 +57,12 @@ class DatabaseSessionProvider(providers.Provider):
             echo=False,
         )
         self.session = sessionmaker(
-            bind=self.engine, autocommit=False, autoflush=False, query_cls=RetryingQuery
+            bind=self.engine,
+            autocommit=False,
+            expire_on_commit=False,  # When True, all instances will be fully expired after each commit(), so that all attribute/object access subsequent to a completed transaction will load from the most recent database state (aka Lazy Loading).
+            # However, with the current session_scope implementation, we are closing the session after each commit. With the closed session after commit(), you will get error whenever we are trying to call that instance because lazy loading on that instance is made whenever that instance is called. (https://docs.sqlalchemy.org/en/20/errors.html#parent-instance-x-is-not-bound-to-a-session-lazy-load-deferred-load-refresh-etc-operation-cannot-proceed)
+            autoflush=False,
+            query_cls=RetryingQuery,
         )
         # event.listen(self.engine, 'checkout', self.execute_keep_alive_query)
 
@@ -80,10 +85,8 @@ def session_scope(session_factory: DatabaseSessionProvider):
     session = session_factory()
     try:
         yield session
-        session.commit()
     except Exception as e:
         session.rollback()
         raise e
     finally:
-        session.expunge_all()
         session.close()

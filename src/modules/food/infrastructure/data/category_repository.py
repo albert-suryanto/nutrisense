@@ -17,8 +17,6 @@ class CategoryRepository:
         self.logger.info(f"Getting category with name: {name}")
         with session_scope(self.db_session_provider) as session:
             category = session.query(Category).filter(Category.name == name).first()
-            if category:
-                session.expunge(category)
         return category
 
     def create(self, category: Category):
@@ -26,9 +24,7 @@ class CategoryRepository:
         with session_scope(self.db_session_provider) as session:
             session.add(category)
             session.commit()
-            session.refresh(category)
-            session.expunge(category)
-            return category
+        return category
 
     def get_or_create(self, category: Category):
         self.logger.info(f"Getting or creating category with name: {category.name}")

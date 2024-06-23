@@ -18,8 +18,6 @@ class NutrientRepository:
         self.logger.info(f"Getting nutrient with name: {name}")
         with session_scope(self.db_session_provider) as session:
             nutrient = session.query(Nutrient).filter(Nutrient.name == name).first()
-            if nutrient:
-                session.expunge(nutrient)
         return nutrient
 
     def create(self, nutrient: Nutrient):
@@ -27,9 +25,7 @@ class NutrientRepository:
         with session_scope(self.db_session_provider) as session:
             session.add(nutrient)
             session.commit()
-            session.refresh(nutrient)
-            session.expunge(nutrient)
-            return nutrient
+        return nutrient
 
     def get_or_create(self, nutrient: Nutrient):
         self.logger.info(f"Getting or creating nutrient with name: {nutrient.name}")
@@ -75,12 +71,16 @@ class NutrientRepository:
                 )
 
             result_list = list(existing_nutrient_dict.values())
-            for nutrient in result_list:
-                session.refresh(nutrient)
-                session.expunge(nutrient)
 
         self.logger.info(
             f"Created {len(new_nutrients)} new nutrients and found {len(existing_nutrients)} existing nutrients."
         )
 
         return result_list
+
+
+# for nutrient in result_list:
+#     session.refresh(nutrient)
+#     session.expunge(nutrient)
+
+# session.refresh(nutrient) -> a relatively expensive operation, especially when refreshing a list of instances (need to do for loop + if the instance has many columns/attributes/relationship (big size)). What refresh(..) does is that each instance is reloaded from the database. This can be useful if you need to make sure that the instance reflects the current state in the database

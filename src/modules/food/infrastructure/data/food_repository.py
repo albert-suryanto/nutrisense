@@ -18,8 +18,6 @@ class FoodRepository:
         self.logger.info(f"Getting food with name: {name}")
         with session_scope(self.db_session_provider) as session:
             food = session.query(Food).filter(Food.name == name).first()
-            if food:
-                session.expunge(food)
         return food
 
     def create(self, food: Food):
@@ -29,9 +27,7 @@ class FoodRepository:
         with session_scope(self.db_session_provider) as session:
             session.add(food)
             session.commit()
-            session.refresh(food)
-            session.expunge(food)
-            return food
+        return food
 
     def get_or_create(self, food: Food):
         self.logger.info(

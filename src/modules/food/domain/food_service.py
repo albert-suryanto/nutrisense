@@ -1,4 +1,5 @@
 from datetime import datetime
+from tqdm import tqdm
 from src.modules.food.domain.models.category import Category
 from src.modules.food.domain.models.food import Food
 from src.modules.food.domain.models.food_nutrient import FoodNutrient
@@ -31,8 +32,11 @@ class FoodService:
         self.food_nutrient_repo = food_nutrient_repo
 
     def load_data(self, data):
-        for item in data:
-            self.logger.info(f"Processing item: {item['description']}")
+        count = len(data)
+        for index, item in enumerate(tqdm(data)):
+            self.logger.info(
+                f"Processing item {index+1}/{count}: {item['description']}"
+            )
             foods_vector = self.embedding_service.generate_embedding(
                 item['description']
             )

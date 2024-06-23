@@ -28,8 +28,6 @@ class FoodNutrientRepository:
                 .filter(FoodNutrient.nutrient_id == nutrient_id)
                 .first()
             )
-            if food_nutrient:
-                session.expunge(food_nutrient)
         return food_nutrient
 
     def create(self, food_nutrient: FoodNutrient):
@@ -40,9 +38,7 @@ class FoodNutrientRepository:
         with session_scope(self.db_session_provider) as session:
             session.add(food_nutrient)
             session.commit()
-            session.refresh(food_nutrient)
-            session.expunge(food_nutrient)
-            return food_nutrient
+        return food_nutrient
 
     def get_or_create(self, food_nutrient: FoodNutrient):
         self.logger.info(
